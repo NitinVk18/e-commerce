@@ -1,243 +1,164 @@
-
 import Axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Payment = () => {
-
-  const navigate = useNavigate()
-
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-
-
-
-  const findUser = () => {
-    const cartItems = JSON.parse(localStorage.getItem('cartItems')) ;
-    //setItems(cartItems);
-    // console.log(cartItems);
-    let x = []
-    for (let i=0;i<cartItems.length;i++)
-     {
-      x.push({"id":cartItems[i].cart_product[0].id,"name":cartItems[i].cart_product[0].name,"price":cartItems[i].cart_product[0].price,"qty":cartItems[i].qty,"filename":cartItems[i].cart_product[0].filename});
-     }
-     setItems(x);
-    //  console.log(x);
-  };
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
 
   useEffect(() => {
-    findUser();
+    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+    let formattedItems = cartItems.map(item => ({
+      id: item.cart_product[0].id,
+      name: item.cart_product[0].name,
+      price: item.cart_product[0].price,
+      qty: item.qty,
+      filename: item.cart_product[0].filename
+    }));
+    setItems(formattedItems);
   }, []);
 
   const handlePayment = async () => {
     const data = {
-      "name": name,
-      "email": email,
-      "amount":localStorage.getItem('gross'),
-      "product": items,
+      name,
+      email,
+      amount: localStorage.getItem('gross'),
+      product: items
     };
-
-    
+    try {
       const response = await Axios.post('http://localhost:4200/showcart/payment', data);
       console.log('Payment Successful:', response.data);
-
-    alert('payment successful')
-
-    
+      alert('Payment successful!');
+    } catch (error) {
+      console.error('Payment Error:', error);
+      alert('Payment failed. Please try again.');
+    }
   };
 
   const handleGenerateBill = () => {
-  
-    // Calculate total amount
-    const totalAmount = items.reduce(
-      (total, item) =>
-        total + parseInt(item.productPrice) * parseInt(item.productQuantity),
-      0
-    );
-
-    // Create bill object
-    const bill = {
-      customerName: name,
-      email: email,
-      items,
-      totalAmount,
-    };
-
-    // Store bill in localStorage
+    const totalAmount = items.reduce((total, item) => total + item.price * item.qty, 0);
+    const bill = { customerName: name, email, items, totalAmount };
     localStorage.setItem('bill', JSON.stringify(bill));
-
-    alert('Bill generated and stored in localStorage.');
-    console.log('Generated Bill:', bill);
-    navigate('/showcart/bill')
+    alert('Bill generated successfully!');
+    navigate('/showcart/bill');
   };
 
   return (
-    <div style={{ padding: '2vw' }}>
-      <h1>Make Payment</h1>
-      <form onSubmit={(e) => { e.preventDefault(); handlePayment(); }}>
-        <div>
-          Customer Name: <input type="text" value={name} onChange={(e) => setName(e.target.value)}     />
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl w-full space-y-8 bg-white p-8 rounded-lg shadow-xl">
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Make Payment</h1>
+
+        {/* Form */}
+        <form onSubmit={(e) => { e.preventDefault(); handlePayment(); }} className="space-y-6">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              Customer Name:
+            </label>
+            <input
+              type="text"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email:
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
+              Total Amount:
+            </label>
+            <input
+              type="number"
+              id="amount"
+              value={localStorage.getItem('gross')}
+              readOnly
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed sm:text-sm"
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-between space-x-4">
+            <button
+              type="submit"
+              className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            >
+              Submit Payment
+            </button>
+            <button
+              type="button"
+              onClick={handleGenerateBill}
+              className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Generate Bill
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/customer')}
+              className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Continue Shopping
+            </button>
+          </div>
+        </form>
+
+        {/* Cart Products Table */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Cart Products:</h2>
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Image
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  ID
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Price
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Quantity
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {items.map((item, index) => (
+                <tr key={index}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <img src={item.filename} alt="Product" className="w-16 h-16 object-cover rounded-md" />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">${item.price.toFixed(2)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.qty}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <div>
-          Email: <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}/>
-        </div>
-        <div>
-          Total Amount: <input type="number" value={localStorage.getItem('gross')} readOnly />
-        </div>
-        <br />
-        <div style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: '2vw' }}>
-          <button type="submit">Submit Payment</button>
-          <button onClick={handleGenerateBill}>Generate Bill</button>
-          <button onClick={() => {
-            navigate('/customer')
-          }}>continue shopping</button>
-        </div>
-      </form>
-
-      <h2>Cart Products:</h2>
-
-      <table > 
-<thead>
-<th>Image</th><th> ID </th> <th> Name </th> <th> Price </th>
-               <th>Quantity</th>       <th>Delete</th> 
-</thead>
-<tbody>
-                        {items.map((item,index)=>{
-                            
-                            return(
-                                <tr key={index}>
-      
-
-      <td> <img src={item.filename} width="100" height="100" /></td>
-       
-                                      <td>{item.id}</td>
-
-                                      <td>{item.name}</td>
-                                      <td>{item.price}</td>
-                                      <td>{item.qty}</td>
-                              
-                                    </tr>
-                            );
-                        })}
-
-                        
-                    </tbody>
-</table>
-
-
+      </div>
     </div>
   );
 };
 
 export default Payment;
-
-
-
-
-
-// import React, { useState,useEffect } from 'react';
-// import Axios from "axios";
-// import {useNavigate} from 'react-router-dom';
-      
-// export default function Payment(props) {
-//   const      [customername, setCustomername] = useState('');
-//   const      [cardno, setCardno] = useState('');
-//   const      [password, setPassword] = useState('');
-//   const      [amount, setAmount] = useState('');  
-//bla bla
-//    function handleChange(e)  {
-//     e.preventDefault();
-//     setCustomername(e.target.value);
-//   }; 
-//   function handleChange1(e)  {
-//     e.preventDefault();
-//     setCardno(e.target.value);
-//   };
-//   function handleChange2(e)  {
-//     e.preventDefault();
-//     setPassword(e.target.value);
-//   }; 
-
-
-
-
-//   const handlePayment = async () => {
-//     const data = {
-//       username: userdt.user.username,
-//       name: userdt.user.name,
-//       email: userdt.user.email,
-//       product: userdt.items,
-//     };
-
-//     try {
-//       const response = await Axios.post('http://localhost:4000/showcart/payment', data);
-//       console.log('Payment Successful:', response.data);
-
-//       // Clear cart after successful payment
-//       localStorage.removeItem('cartItems'); // Assuming cart is stored in localStorage
-//       userdt.items = [];
-
-//       alert('Payment successful! Cart is now empty.');
-//     } catch (error) {
-//       console.error('Payment Failed:', error.response?.data || error.message);
-//       alert(error.response?.data?.error || 'Payment failed. Please try again.');
-//     }
-//   };
-
-
-//   function mysubmit() 
-//     {
-//   const data={"cname":customername,"cardno":cardno,"amount":amount,"products":localStorage.getItem("products")};
-// console.log(data);
-//   Axios.post("http://localhost:4200/payment",data).then(
-// res=> console.log("payment done") );
-// setCardno('');
-//  setPassword('');
-// window.alert("payment done");
-   
-// }
-// useEffect(() => {
-//         setAmount(localStorage.getItem("gross"));
-//         setCustomername(localStorage.getItem("cname"));
-//       },[]);
-
-
-
-//   return (
-//      <div>
-//    <br/>
-// Customer Name
-//     <input type="text" value={customername} onChange={handleChange} />
-    
-
-
-// Card No
-//     <input type="text" value={cardno} onChange={handleChange1}/>
-    
-  
-// Password <input type="password" placeholder="Password" value={password}
-// onChange={handleChange2}
-//  />
-  
-  
-// Amount
-//     <input type="text" placeholder="Amount"
-//  value={amount}
-         
-//  />
-
- 
-//   <button type="button" onClick={mysubmit}>
-//     Submit
-//   </button>
-
-
-// <a href="/bill">Generate Bill </a>
-
-
-//       </div>
-      
-                
-//   );
-// }

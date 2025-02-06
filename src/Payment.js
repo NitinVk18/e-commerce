@@ -29,10 +29,8 @@ const Payment = () => {
     };
     try {
       const response = await Axios.post('http://localhost:4200/showcart/payment', data);
-      console.log('Payment Successful:', response.data);
       alert('Payment successful!');
     } catch (error) {
-      console.error('Payment Error:', error);
       alert('Payment failed. Please try again.');
     }
   };
@@ -46,116 +44,45 @@ const Payment = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl w-full space-y-8 bg-white p-8 rounded-lg shadow-xl">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Make Payment</h1>
-
-        {/* Form */}
-        <form onSubmit={(e) => { e.preventDefault(); handlePayment(); }} className="space-y-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-              Customer Name:
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email:
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
-
-          <div>
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
-              Total Amount:
-            </label>
-            <input
-              type="number"
-              id="amount"
-              value={localStorage.getItem('gross')}
-              readOnly
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed sm:text-sm"
-            />
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-between space-x-4">
-            <button
-              type="submit"
-              className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            >
-              Submit Payment
-            </button>
-            <button
-              type="button"
-              onClick={handleGenerateBill}
-              className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Generate Bill
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/customer')}
-              className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Continue Shopping
-            </button>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(to right, #6a11cb, #2575fc)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+      <div style={{ maxWidth: '800px', width: '100%', background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)' }}>
+        <h1 style={{ textAlign: 'center', color: '#333', fontSize: '2rem', marginBottom: '1rem' }}>Make Payment</h1>
+        
+        <form onSubmit={(e) => { e.preventDefault(); handlePayment(); }}>
+          <input type="text" placeholder="Customer Name" value={name} onChange={(e) => setName(e.target.value)} style={{ width: '100%', padding: '10px', marginBottom: '1rem', borderRadius: '8px', border: '1px solid #ccc' }} required />
+          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: '100%', padding: '10px', marginBottom: '1rem', borderRadius: '8px', border: '1px solid #ccc' }} required />
+          <input type="number" value={localStorage.getItem('gross')} readOnly style={{ width: '100%', padding: '10px', borderRadius: '8px', background: '#f5f5f5', border: 'none', textAlign: 'center', marginBottom: '1rem' }} />
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <button type="submit" style={{ padding: '10px 20px', background: '#28a745', color: 'white', borderRadius: '8px', border: 'none', cursor: 'pointer', transition: '0.3s' }}>Submit Payment</button>
+            <button type="button" onClick={handleGenerateBill} style={{ padding: '10px 20px', background: '#007bff', color: 'white', borderRadius: '8px', border: 'none', cursor: 'pointer', transition: '0.3s' }}>Generate Bill</button>
+            <button type="button" onClick={() => navigate('/customer')} style={{ padding: '10px 20px', background: '#ffc107', color: 'white', borderRadius: '8px', border: 'none', cursor: 'pointer', transition: '0.3s' }}>Continue Shopping</button>
           </div>
         </form>
 
-        {/* Cart Products Table */}
-        <div className="mt-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Cart Products:</h2>
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Image
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ID
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Price
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Quantity
-                </th>
+        <h2 style={{ marginTop: '2rem', color: '#333', fontSize: '1.5rem' }}>Cart Products:</h2>
+        <table style={{ width: '100%', marginTop: '1rem', borderCollapse: 'collapse' }}>
+          <thead style={{ background: '#eee' }}>
+            <tr>
+              <th style={{ padding: '10px', borderBottom: '2px solid #ddd' }}>Image</th>
+              <th style={{ padding: '10px', borderBottom: '2px solid #ddd' }}>ID</th>
+              <th style={{ padding: '10px', borderBottom: '2px solid #ddd' }}>Name</th>
+              <th style={{ padding: '10px', borderBottom: '2px solid #ddd' }}>Price</th>
+              <th style={{ padding: '10px', borderBottom: '2px solid #ddd' }}>Qty</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item, index) => (
+              <tr key={index} style={{ textAlign: 'center', background: index % 2 === 0 ? '#fafafa' : '#fff' }}>
+                <td style={{ padding: '10px' }}><img src={item.filename} alt="Product" style={{ width: '50px', height: '50px', borderRadius: '8px' }} /></td>
+                <td style={{ padding: '10px' }}>{item.id}</td>
+                <td style={{ padding: '10px' }}>{item.name}</td>
+                <td style={{ padding: '10px' }}>${item.price.toFixed(2)}</td>
+                <td style={{ padding: '10px' }}>{item.qty}</td>
               </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {items.map((item, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <img src={item.filename} alt="Product" className="w-16 h-16 object-cover rounded-md" />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">${item.price.toFixed(2)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.qty}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

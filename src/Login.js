@@ -6,33 +6,6 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const containerStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100vh',
-    backgroundColor: '#f4f4f4'
-  };
-
-  const inputStyle = {
-    margin: '10px',
-    padding: '10px',
-    width: '250px',
-    borderRadius: '5px',
-    border: '1px solid #ccc'
-  };
-
-  const buttonStyle = {
-    padding: '10px 20px',
-    backgroundColor: '#007BFF',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    marginTop: '10px'
-  };
-
   async function mysubmit() {
     const data = { username, password };
     const config = {
@@ -61,23 +34,30 @@ export default function Login() {
   }
 
   return (
-    <div style={containerStyle}>
-      <h2>Login</h2>
-      <input 
-        type="text" 
-        placeholder="Enter Username" 
-        value={username} 
-        onChange={(e) => setUserName(e.target.value)} 
-        style={inputStyle} 
-      />
-      <input 
-        type="password" 
-        placeholder="Enter Password" 
-        value={password} 
-        onChange={(e) => setPassword(e.target.value)} 
-        style={inputStyle} 
-      />
-      <button style={buttonStyle} onClick={mysubmit}>Submit</button>
+    <div className="flex justify-center items-center h-screen bg-gray-100">
+      <div className="bg-white shadow-lg rounded-xl p-6 w-96">
+        <h2 className="text-2xl font-semibold text-center mb-4">Login</h2>
+        <input 
+          type="text" 
+          placeholder="Enter Username" 
+          value={username} 
+          onChange={(e) => setUserName(e.target.value)} 
+          className="w-full p-2 mb-3 border border-gray-300 rounded-md"
+        />
+        <input 
+          type="password" 
+          placeholder="Enter Password" 
+          value={password} 
+          onChange={(e) => setPassword(e.target.value)} 
+          className="w-full p-2 mb-3 border border-gray-300 rounded-md"
+        />
+        <button 
+          className="w-full p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+          onClick={mysubmit}
+        >
+          Submit
+        </button>
+      </div>
     </div>
   );
 }
